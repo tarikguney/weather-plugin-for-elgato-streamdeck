@@ -12,8 +12,7 @@
 <script>
 
     if ($SD) {
-        var actionName = "com.tarikguney.weather.action"
-        var weatherEndpoint = "http://api.openweathermap.org/data/2.5/weather?zip={zipCode},us&appid=e2d4dca5dc8d0f1a430e43a85385c983";
+        const actionName = "com.tarikguney.weather.action";
 
         $SD.on("connected", function (jsonObj) {
             console.log("Connected!");
@@ -24,40 +23,71 @@
         });
 
         $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
+            let apiKey = "i0jNkpfiwdGPUpKtA5oxNO3sJCUTpCtc";
+
             var jsonPayload = jsonObj.payload;
             if (jsonPayload.settings.hasOwnProperty("lastCheckTime")) {
                 var lastCheckTime = jsonPayload.settings.lastCheckTime;
                 if (moment().diff(lastCheckTime, "hours") >= 1) {
                     $SD.api.setSettings(jsonObj.context, {lastCheckTime: moment()});
-                    getWeather(jsonObj.context);
+                    $SD.api.setTitle(jsonObj.context, "Updating\nWeather");
+                    setTitleWithWeather(jsonObj.context, apiKey, jsonObj.payload.settings.zipCode);
                 }
             } else {
                 $SD.api.setSettings(jsonObj.context, {lastCheckTime: moment()});
-                getWeather(jsonObj.context);
+                $SD.api.setTitle(jsonObj.context, "Updating\nWeather");
+                setTitleWithWeather(jsonObj.context, apiKey, jsonObj.payload.settings.zipCode);
             }
         });
 
         $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
-            weatherEndpoint = weatherEndpoint.replace("{zipCode}", jsonObj.payload.zipCode);
+            $SD.api.setSettings(jsonObj.context, {zipCode: jsonObj.payload.zipCode});
             $SD.api.getSettings(jsonObj.context);
         });
 
-        function getWeather(context) {
-            var weatherAjax = new XMLHttpRequest();
-            weatherAjax.open("GET", weatherEndpoint);
+        function setTitleWithWeather(context, apiKey, zipCode) {
+            getLocationCode(zipCode, apiKey, result => {
+                if (result == "error") {
+                    $SD.api.setTitle(context, "Error");
+                }
+                $SD.api.setTitle(context, result.Mood + "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
+            });
+        }
 
-            $SD.api.setTitle(context, "Updating\nWeather\Info");
+        function getWeather(apiKey, locationKey, updateTitleFn) {
+            let endpoint = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{locationKey}?apikey={apiKey}";
+            let call = new XMLHttpRequest();
+            call.open("GET", endpoint.replace("{apiKey}", apiKey).replace("{locationKey}", locationKey));
 
-            weatherAjax.onreadystatechange = function () {
-                if (weatherAjax.readyState === 4 && weatherAjax.status === 200) {
-                    weatherAjax.responseText
-                    var response = JSON.parse(weatherAjax.responseText);
-                    $SD.setTitle(context, response.main.temp);
+            call.onreadystatechange = function () {
+                if (call.readyState === 4 && call.status === 200) {
+                    var response = JSON.parse(call.responseText);
+                    updateTitleFn({"Mood": response[0].IconPhrase, "Temperature": response[0].Temperature});
+                } else {
+                    updateTitleFn("error");
                 }
             }
-            
-            weatherAjax.send();
+
+            call.send();
         }
+
+        function getLocationCode(zipCode, apiKey, updateTitleFn) {
+            let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/us/search?apikey={apiKey}&q={zipCode}";
+            let call = new XMLHttpRequest();
+            call.open("GET", locationEndPoint.replace("{apiKey}", apiKey).replace("{zipCode}", zipCode));
+            call.onreadystatechange = function () {
+                if (call.readyState === 4 && call.status === 200) {
+                    let response = JSON.parse(call.responseText);
+                    let locationKey = response[0].Key;
+
+                    getWeather(apiKey, locationKey, updateTitleFn);
+                }
+            }
+
+            call.send();
+        }
+
+
     }
 
 </script>
