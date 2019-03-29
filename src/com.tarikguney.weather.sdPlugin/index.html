@@ -2,94 +2,78 @@
 <html>
 
 <head>
-	<title>com.elgato.numberdisplay</title>
-	<meta charset="utf-8" />
+    <title>com.tarikguney.weather</title>
+    <meta charset="utf-8"/>
+    <script src="common.js"></script>
+    <script src="moment.js"></script>
 </head>
 
 <body>
-	<script>
+<script>
 
-		var websocket = null;
-		var pluginUUID = null;
-		var settingsCache = {};
+    if ($SD) {
+        var action = null;
+        var context = null;
+        var weatherEndpoint = "http://api.openweathermap.org/data/2.5/weather?zip={zipCode},us&appid=e2d4dca5dc8d0f1a430e43a85385c983";
 
-		var DestinationEnum = Object.freeze({ "HARDWARE_AND_SOFTWARE": 0, "HARDWARE_ONLY": 1, "SOFTWARE_ONLY": 2 })
+        $SD.on("connected", function (jsonObj) {
+            var event = jsonObj['event'];
+            action = jsonObj['action'];
+            context = jsonObj['context'];
+            var jsonPayload = jsonObj['payload'] || {};
 
-		var titleChangeAction = {
+            if (event === "willAppear") {
+               
+            }
 
-			type: "com.elgato.numberdisplay.action",
+            if (event === "didReceiveSettings") {
+               
+            }
 
-			onWillAppear: function (context, settings, coordinates) {
+            if (event === "sendToPlugin") {
+               
+            }
+        });
 
-				var keyPressCounter = 0;
-				if (settings != null && settings.hasOwnProperty('keyPressCounter')) {
-					keyPressCounter = settings["keyPressCounter"];
-				}
-				settingsCache[context] = { 'keyPressCounter': keyPressCounter };
-				this.SetTitle(context, keyPressCounter);
-			},
+        $SD.on("willAppear", function (jsonObj) {
+            $SD.api.getSettings(context);
+        });
 
-			SetTitle: function (context, customTitle) {
-				var json = {
-					"event": "setTitle",
-					"context": context,
-					"payload": {
-						"title": "" + customTitle,
-						"target": DestinationEnum.HARDWARE_AND_SOFTWARE
-					}
-				};
+        $SD.on("didReceiveSettings", function (jsonPayload) {
+            if (jsonPayload.settings.hasOwnProperty("lastCheckTime")) {
+                var lastCheckTime = jsonPayload.settings.lastCheckTime;
+                if (moment().diff(lastCheckTime, "hours") >= 1) {
+                    $SD.api.setSettings(context, {lastCheckTime: moment()});
+                    getWeather();
+                }
+            } else {
+                $SD.api.setSettings(context, {lastCheckTime: moment()});
+                getWeather();
+            }
+        });
 
-				websocket.send(JSON.stringify(json));
-			}
-		};
+        $SD.on("sentToPlugin", function (jsonPayload) {
+            weatherEndpoint = weatherEndpoint.replace("{zipCode}", jsonPayload.zipCode);
+            $SD.api.getSettings(context);
+        });
 
-		function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
-			pluginUUID = inPluginUUID
+        function getWeather() {
+            var weatherAjax = new XMLHttpRequest();
+            weatherAjax.open("GET", weatherEndpoint);
 
-			// Open the web socket
-			websocket = new WebSocket("ws://localhost:" + inPort);
+            $SD.api.setTitle(context, "Updating\nWeather\Info");
 
-			function registerPlugin(inPluginUUID) {
-				var json = {
-					"event": inRegisterEvent,
-					"uuid": inPluginUUID
-				};
+            weatherAjax.onreadystatechange = function () {
+                if (weatherAjax.readyState === 4 && weatherAjax.status === 200) {
+                    weatherAjax.responseText
+                    var response = JSON.parse(weatherAjax.responseText);
+                    $SD.setTitle(context, response.main.temp);
+                }
+            }
+        }
+    }
 
-				websocket.send(JSON.stringify(json));
-			};
-
-			websocket.onopen = function () {
-				// WebSocket is connected, send message
-				registerPlugin(pluginUUID);
-			};
-
-			websocket.onmessage = function (evt) {
-				// Received message from Stream Deck
-				var jsonObj = JSON.parse(evt.data);
-				var event = jsonObj['event'];
-				var action = jsonObj['action'];
-				var context = jsonObj['context'];
-				var jsonPayload = jsonObj['payload'] || {};
-
-				if (event == "keyDown") {
-					var settings = jsonPayload['settings'];
-					var coordinates = jsonPayload['coordinates'];
-					var userDesiredState = jsonPayload['userDesiredState'];
-					titleChangeAction.SetTitle(context, "tarik guneyden selamlar...");
-				}
-				else if (event == "willAppear") {
-					var settings = jsonPayload['settings'];
-					var coordinates = jsonPayload['coordinates'];
-					titleChangeAction.onWillAppear(context, settings, coordinates);
-				}
-			};
-
-			websocket.onclose = function () {
-				// Websocket is closed
-			};
-		}
-
-	</script>
+</script>
 
 </body>
 

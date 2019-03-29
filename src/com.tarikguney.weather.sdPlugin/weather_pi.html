@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>com.elgato.numberdisplay PI</title>
+    <title>com.tarikguney.weather</title>
     <link rel="stylesheet" href="sdpi.css">
     <script src="common.js"></script>
 </head>
@@ -11,8 +11,8 @@
 <body>
     <div class="sdpi-wrapper">
         <div class="sdpi-item">
-            <div class="sdpi-item-label">Selamlar</div>
-            <input class="sdpi-item-value" id="helloworld" value="Tarik'tan Selamlar" onchange="sendValueToPlugin(event.target.value,'title')">
+            <div class="sdpi-item-label">Zip Code</div>
+            <input class="sdpi-item-value" id="zipCode" value="" onchange="setZipCode(event.target.value)">
         </div>
     </div>
 
@@ -35,13 +35,11 @@
         *    
         */
 
-        function sendValueToPlugin(value, param) {
+        function setZipCode(value) {
 
             if ($SD && $SD.connection) {
                 var payload = {};
-                if (param) {
-                    payload[param] = value;
-                }
+                payload.zipCode = value;
                 $SD.api.sendToPlugin(uuid, pluginAction, payload);
             }
         }
