@@ -12,52 +12,37 @@
 <script>
 
     if ($SD) {
-        var action = null;
-        var context = null;
+        var actionName = "com.tarikguney.weather.action"
         var weatherEndpoint = "http://api.openweathermap.org/data/2.5/weather?zip={zipCode},us&appid=e2d4dca5dc8d0f1a430e43a85385c983";
 
         $SD.on("connected", function (jsonObj) {
-            var event = jsonObj['event'];
-            action = jsonObj['action'];
-            context = jsonObj['context'];
-            var jsonPayload = jsonObj['payload'] || {};
-
-            if (event === "willAppear") {
-               
-            }
-
-            if (event === "didReceiveSettings") {
-               
-            }
-
-            if (event === "sendToPlugin") {
-               
-            }
+            console.log("Connected!");
         });
 
-        $SD.on("willAppear", function (jsonObj) {
-            $SD.api.getSettings(context);
+        $SD.on(actionName + ".willAppear", function (jsonObj) {
+            $SD.api.getSettings(jsonObj.context);
         });
 
-        $SD.on("didReceiveSettings", function (jsonPayload) {
+        $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
+            var jsonPayload = jsonObj.payload;
             if (jsonPayload.settings.hasOwnProperty("lastCheckTime")) {
                 var lastCheckTime = jsonPayload.settings.lastCheckTime;
                 if (moment().diff(lastCheckTime, "hours") >= 1) {
-                    $SD.api.setSettings(context, {lastCheckTime: moment()});
-                    getWeather();
+                    $SD.api.setSettings(jsonObj.context, {lastCheckTime: moment()});
+                    getWeather(jsonObj.context);
                 }
             } else {
-                $SD.api.setSettings(context, {lastCheckTime: moment()});
-                getWeather();
+                $SD.api.setSettings(jsonObj.context, {lastCheckTime: moment()});
+                getWeather(jsonObj.context);
             }
         });
 
-        $SD.on("sentToPlugin", function (jsonPayload) {
-            weatherEndpoint = weatherEndpoint.replace("{zipCode}", jsonPayload.zipCode);
-            $SD.api.getSettings(context);
+        $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
+            weatherEndpoint = weatherEndpoint.replace("{zipCode}", jsonObj.payload.zipCode);
+            $SD.api.getSettings(jsonObj.context);
         });
 
-        function getWeather() {
+        function getWeather(context) {
             var weatherAjax = new XMLHttpRequest();
             weatherAjax.open("GET", weatherEndpoint);
 
@@ -70,6 +55,8 @@
                     $SD.setTitle(context, response.main.temp);
                 }
             }
+            
+            weatherAjax.send();
         }
     }
 
