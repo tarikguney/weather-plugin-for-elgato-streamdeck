@@ -2,49 +2,69 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>com.tarikguney.weather</title>
     <link rel="stylesheet" href="sdpi.css">
     <script src="common.js"></script>
 </head>
 
 <body>
-    <div class="sdpi-wrapper">
-        <div class="sdpi-item">
-            <div class="sdpi-item-label">Zip Code</div>
-            <input class="sdpi-item-value" id="zipCode" value="" onchange="setZipCode(event.target.value)">
-        </div>
+<div class="sdpi-wrapper">
+    <div class="sdpi-item">
+        <div class="sdpi-item-label">Zip Code</div>
+        <input class="sdpi-item-value" id="zipCode" required onchange="zipCode=event.target.value">
+
     </div>
+    <div class="sdpi-item">
+        <div class="sdpi-item-label">AccuWeather API Key</div>
+        <input class="sdpi-item-value" id="apiKey" required onchange="apiKey=event.target.value">
+    </div>
+    <div class="sdpi-item">
+        <button class="sdpi-item-value" id="saveButton" onclick="sendToPlugin()">Save</button>
+    </div>
+</div>
 
-    <script>
-        var pluginAction = null,
-            uuid = '';
+<script>
+    let pluginAction = null,
+        uuid = '',
+        zipCode = "",
+        apiKey = "",
+        actionName = "com.tarikguney.weather.action";
 
-        if ($SD) {
-            $SD.on('connected', function (jsonObj) {
-                uuid = jsonObj['uuid'];
-                if (jsonObj.hasOwnProperty('actionInfo')) {
-                    pluginAction = jsonObj.actionInfo['action'];
-                }
-            });
-        };
+    if ($SD) {
+        $SD.on('connected', function (jsonObj) {
+            uuid = jsonObj['uuid'];
+            if (jsonObj.hasOwnProperty('actionInfo')) {
+                pluginAction = jsonObj.actionInfo['actionName'];
+            }
+        });
 
-        /** you can also use ES6 syntax like so:
-        *
-        *   if ($SD) $SD.on('connected', (jsonObj) => { uuid=jsonObj.uuid }));
-        *    
-        */
+        $SD.on(actionName + ".propertyInspectorDidAppear", function (jsonObj) {
+            $SD.api.getSettings(jsonObj.context);
+        });
 
-        function setZipCode(value) {
+        $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
+            if (jsonObj.settings.hasOwnProperty("zipCode")) {
+                let settings = jsonObj.payload.settings;
+                document.getElementById("zipCode").value = settings.zipCode;
+                document.getElementById("apiKey").value = settings.apiKey;
+            }
+        });
+    }
 
+    function sendToPlugin() {
+        if (zipCode && apiKey) {
             if ($SD && $SD.connection) {
-                var payload = {};
-                payload.zipCode = value;
+                let payload = {};
+                payload.zipCode = zipCode;
+                payload.apiKey = apiKey;
                 $SD.api.sendToPlugin(uuid, pluginAction, payload);
             }
         }
 
-    </script>
+    }
+
+</script>
 
 </body>
 

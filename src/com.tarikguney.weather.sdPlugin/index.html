@@ -22,32 +22,24 @@
             $SD.api.getSettings(jsonObj.context);
         });
 
-        $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
-            let apiKey = "i0jNkpfiwdGPUpKtA5oxNO3sJCUTpCtc";
-
-            var jsonPayload = jsonObj.payload;
-            if (jsonPayload.settings.hasOwnProperty("lastCheckTime")) {
-                var lastCheckTime = jsonPayload.settings.lastCheckTime;
-                if (moment().diff(lastCheckTime, "hours") >= 1) {
-                    $SD.api.setSettings(jsonObj.context, {lastCheckTime: moment()});
-                    $SD.api.setTitle(jsonObj.context, "Updating\nWeather");
-                    setTitleWithWeather(jsonObj.context, apiKey, jsonObj.payload.settings.zipCode);
-                }
-            } else {
-                $SD.api.setSettings(jsonObj.context, {lastCheckTime: moment()});
-                $SD.api.setTitle(jsonObj.context, "Updating\nWeather");
-                setTitleWithWeather(jsonObj.context, apiKey, jsonObj.payload.settings.zipCode);
-            }
-        });
-
         $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
-            $SD.api.setSettings(jsonObj.context, {zipCode: jsonObj.payload.zipCode});
+            $SD.api.setSettings(jsonObj.context, {
+                zipCode: jsonObj.payload.zipCode,
+                apiKey: jsonObj.payload.apiKey
+            });
+
+            // Initial call for the first time, then schedule for every 1 hours.
+            setTitleWithWeather(jsonObj.context, jsonObj.payload.zipCode, jsonObj.payload.apiKey)
+            setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.zipCode, jsonObj.payload.apiKey),
+                moment.duration(1, 'hours').asMilliseconds());
+
             $SD.api.getSettings(jsonObj.context);
         });
 
         function setTitleWithWeather(context, apiKey, zipCode) {
+            $SD.api.setTitle(context, "Updating...");
             getLocationCode(zipCode, apiKey, result => {
-                if (result == "error") {
+                if (result === "error") {
                     $SD.api.setTitle(context, "Error");
                 }
                 $SD.api.setTitle(context, result.Mood + "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
@@ -61,12 +53,12 @@
 
             call.onreadystatechange = function () {
                 if (call.readyState === 4 && call.status === 200) {
-                    var response = JSON.parse(call.responseText);
+                    let response = JSON.parse(call.responseText);
                     updateTitleFn({"Mood": response[0].IconPhrase, "Temperature": response[0].Temperature});
                 } else {
                     updateTitleFn("error");
                 }
-            }
+            };
 
             call.send();
         }
@@ -82,12 +74,10 @@
 
                     getWeather(apiKey, locationKey, updateTitleFn);
                 }
-            }
+            };
 
             call.send();
         }
-
-
     }
 
 </script>
