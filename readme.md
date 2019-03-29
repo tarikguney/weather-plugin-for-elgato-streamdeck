@@ -32,11 +32,11 @@ Unfortunately, AccuWeather offers only 50 calls per day for each plugin with fre
 
 Check out the image below:
 
-![api-key](key-acquisition.png)
+![api-key-2](key-obtain.png)
 
 ### Problem?
 
-Please create an issue to report the issues. I will be working on this plugin for a while to make it even better. I would appreciate if you let me know the problems you run into during your usage.
+Please report your issues here https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck/issues. I will be working on this plugin for a while to make it even better. I would appreciate if you let me know the problems you run into during your usage.
 
 ## Developed By
 
