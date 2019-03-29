@@ -12,12 +12,12 @@
 <div class="sdpi-wrapper">
     <div class="sdpi-item">
         <div class="sdpi-item-label">Zip Code</div>
-        <input class="sdpi-item-value" id="zipCode" required onchange="zipCode=event.target.value">
+        <input class="sdpi-item-value" id="zipCode" required onblur="zipCode=event.target.value">
 
     </div>
     <div class="sdpi-item">
         <div class="sdpi-item-label">AccuWeather API Key</div>
-        <input class="sdpi-item-value" id="apiKey" required onchange="apiKey=event.target.value">
+        <input class="sdpi-item-value" id="apiKey" required onblur="apiKey=event.target.value">
     </div>
     <div class="sdpi-item">
         <button class="sdpi-item-value" id="saveButton" onclick="sendToPlugin()">Save</button>
@@ -25,26 +25,31 @@
 </div>
 
 <script>
-    let pluginAction = null,
-        uuid = '',
+    let uuid = '',
         zipCode = "",
         apiKey = "",
-        actionName = "com.tarikguney.weather.action";
+        actionName = "";
 
     if ($SD) {
         $SD.on('connected', function (jsonObj) {
             uuid = jsonObj['uuid'];
             if (jsonObj.hasOwnProperty('actionInfo')) {
-                pluginAction = jsonObj.actionInfo['actionName'];
+                actionName = jsonObj.actionInfo.action;
             }
+            let settings = $SD.actionInfo.payload.settings;
+            document.getElementById("zipCode").value = settings.zipCode;
+            document.getElementById("apiKey").value = settings.apiKey;
         });
 
-        $SD.on(actionName + ".propertyInspectorDidAppear", function (jsonObj) {
-            $SD.api.getSettings(jsonObj.context);
-        });
+
+       /* setTimeout(()=> {
+            let settings = $SD.actionInfo.payload.settings;
+            document.getElementById("zipCode").value = settings.zipCode;
+            document.getElementById("apiKey").value = settings.apiKey;
+        }, 1000);*/
 
         $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
-            if (jsonObj.settings.hasOwnProperty("zipCode")) {
+            if (jsonObj.payload.settings.hasOwnProperty("zipCode")) {
                 let settings = jsonObj.payload.settings;
                 document.getElementById("zipCode").value = settings.zipCode;
                 document.getElementById("apiKey").value = settings.apiKey;
@@ -58,7 +63,7 @@
                 let payload = {};
                 payload.zipCode = zipCode;
                 payload.apiKey = apiKey;
-                $SD.api.sendToPlugin(uuid, pluginAction, payload);
+                $SD.api.sendToPlugin(uuid, actionName, payload);
             }
         }
 

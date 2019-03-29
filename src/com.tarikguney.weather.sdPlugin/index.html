@@ -29,8 +29,8 @@
             });
 
             // Initial call for the first time, then schedule for every 1 hours.
-            setTitleWithWeather(jsonObj.context, jsonObj.payload.zipCode, jsonObj.payload.apiKey)
-            setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.zipCode, jsonObj.payload.apiKey),
+            setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode);
+            setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode),
                 moment.duration(1, 'hours').asMilliseconds());
 
             $SD.api.getSettings(jsonObj.context);
