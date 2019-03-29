@@ -1,0 +1,41 @@
+{
+  "Actions": [
+    {
+      "Icon": "weather-icon",
+      "Name": "Weather",
+      "States": [
+        {
+          "Image": "weather-iconr",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "A beautiful weather plugin developed by Tarik Guney",
+      "UUID": "com.tarikguney.weather.action"
+    }
+  ],
+  "SDKVersion": 2,
+  "Author": "Tarik Guney",
+  "CodePath": "index.html",
+  "Description": "A beautiful open source weather plugin developed by Tarik Guney.",
+  "Name": "Weather",
+  "Icon": "weather-icon",
+  "URL": "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck",
+  "PropertyInspectorPath": "weather_pi.html",
+  "Version": "1.0",
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "10.11"
+    },
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+    }
+}

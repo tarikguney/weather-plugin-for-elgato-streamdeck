@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>com.elgato.numberdisplay</title>
+	<meta charset="utf-8" />
+</head>
+
+<body>
+	<script>
+
+		var websocket = null;
+		var pluginUUID = null;
+		var settingsCache = {};
+
+		var DestinationEnum = Object.freeze({ "HARDWARE_AND_SOFTWARE": 0, "HARDWARE_ONLY": 1, "SOFTWARE_ONLY": 2 })
+
+		var titleChangeAction = {
+
+			type: "com.elgato.numberdisplay.action",
+
+			onWillAppear: function (context, settings, coordinates) {
+
+				var keyPressCounter = 0;
+				if (settings != null && settings.hasOwnProperty('keyPressCounter')) {
+					keyPressCounter = settings["keyPressCounter"];
+				}
+				settingsCache[context] = { 'keyPressCounter': keyPressCounter };
+				this.SetTitle(context, keyPressCounter);
+			},
+
+			SetTitle: function (context, customTitle) {
+				var json = {
+					"event": "setTitle",
+					"context": context,
+					"payload": {
+						"title": "" + customTitle,
+						"target": DestinationEnum.HARDWARE_AND_SOFTWARE
+					}
+				};
+
+				websocket.send(JSON.stringify(json));
+			}
+		};
+
+		function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
+			pluginUUID = inPluginUUID
+
+			// Open the web socket
+			websocket = new WebSocket("ws://localhost:" + inPort);
+
+			function registerPlugin(inPluginUUID) {
+				var json = {
+					"event": inRegisterEvent,
+					"uuid": inPluginUUID
+				};
+
+				websocket.send(JSON.stringify(json));
+			};
+
+			websocket.onopen = function () {
+				// WebSocket is connected, send message
+				registerPlugin(pluginUUID);
+			};
+
+			websocket.onmessage = function (evt) {
+				// Received message from Stream Deck
+				var jsonObj = JSON.parse(evt.data);
+				var event = jsonObj['event'];
+				var action = jsonObj['action'];
+				var context = jsonObj['context'];
+				var jsonPayload = jsonObj['payload'] || {};
+
+				if (event == "keyDown") {
+					var settings = jsonPayload['settings'];
+					var coordinates = jsonPayload['coordinates'];
+					var userDesiredState = jsonPayload['userDesiredState'];
+					titleChangeAction.SetTitle(context, "tarik guneyden selamlar...");
+				}
+				else if (event == "willAppear") {
+					var settings = jsonPayload['settings'];
+					var coordinates = jsonPayload['coordinates'];
+					titleChangeAction.onWillAppear(context, settings, coordinates);
+				}
+			};
+
+			websocket.onclose = function () {
+				// Websocket is closed
+			};
+		}
+
+	</script>
+
+</body>
+
+</html>
