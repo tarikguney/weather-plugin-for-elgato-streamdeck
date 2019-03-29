@@ -20,6 +20,12 @@
         <input class="sdpi-item-value" id="apiKey" required onblur="apiKey=event.target.value">
     </div>
     <div class="sdpi-item">
+        <div class="sdpi-item-label">About the API Key</div>
+        <details class="sdpi-item-value">
+            <p>Unfortunately, AccuWeather allows 50 requests per day to the their forecast API for free accounts. Therefore, you should get your own API Key. It is easy. Just create a new account and visit <a href="https://developer.accuweather.com/user/me/apps">https://developer.accuweather.com/user/me/apps</a> to get your API key by adding a new application.eam</p>
+        </details>
+    </div>
+    <div class="sdpi-item">
         <button class="sdpi-item-value" id="saveButton" onclick="sendToPlugin()">Save</button>
     </div>
 </div>
@@ -37,8 +43,12 @@
                 actionName = jsonObj.actionInfo.action;
             }
             let settings = $SD.actionInfo.payload.settings;
-            document.getElementById("zipCode").value = settings.zipCode;
-            document.getElementById("apiKey").value = settings.apiKey;
+            if (settings.zipCode) {
+                document.getElementById("zipCode").value = settings.zipCode;
+            }
+            if (settings.apiKey) {
+                document.getElementById("apiKey").value = settings.apiKey;
+            }
         });
     }
 

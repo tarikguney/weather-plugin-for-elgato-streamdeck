@@ -12,7 +12,7 @@
 <script>
 
     var interval;
-    
+
     if ($SD) {
         const actionName = "com.tarikguney.weather.action";
 
@@ -33,7 +33,7 @@
             if (interval) {
                 clearInterval(interval);
             }
-            
+
             // Initial call for the first time, then schedule for every 1 hours.
             setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode);
             interval = setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode),
@@ -43,28 +43,18 @@
         function setTitleWithWeather(context, apiKey, zipCode) {
             $SD.api.setTitle(context, "Updating...");
             getLocationCode(zipCode, apiKey, result => {
-                if (result === "error") {
-                    $SD.api.setTitle(context, "Error");
+                if (!result.hasOwnProperty("Mood")) {
+                    $SD.api.setTitle(context, result);
+                    return;
                 }
                 $SD.api.setTitle(context, result.Mood + "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
+                let url = "https://developer.accuweather.com/sites/default/files/{Icon}-s.png";
+                toDataURL(url.replace("{Icon}", result.Icon),
+                    function (dataUrl) {
+                        $SD.api.setImage(context, dataUrl);
+                    }
+                );
             });
-        }
-
-        function getWeather(apiKey, locationKey, updateTitleFn) {
-            let endpoint = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{locationKey}?apikey={apiKey}";
-            let call = new XMLHttpRequest();
-            call.open("GET", endpoint.replace("{apiKey}", apiKey).replace("{locationKey}", locationKey));
-
-            call.onreadystatechange = function () {
-                if (call.readyState === 4 && call.status === 200) {
-                    let response = JSON.parse(call.responseText);
-                    updateTitleFn({"Mood": response[0].IconPhrase, "Temperature": response[0].Temperature});
-                } else {
-                    updateTitleFn("error");
-                }
-            };
-
-            call.send();
         }
 
         function getLocationCode(zipCode, apiKey, updateTitleFn) {
@@ -77,11 +67,62 @@
                     let locationKey = response[0].Key;
 
                     getWeather(apiKey, locationKey, updateTitleFn);
+                } else if (call.readyState === 4 && call.status === 503) {
+                    // Exceeded the number of allowed calls from AccuWeather Free API.
+                    updateTitleFn("Exceeded...!")
+                } else if (call.readyState === 4) {
+                    updateTitleFn("Error!\nTry again\nlater!")
                 }
             };
 
             call.send();
         }
+
+        function getWeather(apiKey, locationKey, updateTitleFn) {
+            let endpoint = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{locationKey}?apikey={apiKey}";
+            let call = new XMLHttpRequest();
+            call.open("GET", endpoint.replace("{apiKey}", apiKey).replace("{locationKey}", locationKey));
+
+            call.onreadystatechange = function () {
+                if (call.readyState === 4 && call.status === 200) {
+                    let response = JSON.parse(call.responseText);
+                    updateTitleFn({
+                        "Mood": response[0].IconPhrase.replace(" ", "\n"),
+                        "Icon": response[0].WeatherIcon,
+                        "Temperature": response[0].Temperature
+                    });
+                } else if (call.readyState === 4 && call.status === 503) {
+                    // Exceeded the number of allowed calls from AccuWeather Free API.
+                    updateTitleFn("Exceeded...!")
+                } else if (call.readyState === 4) {
+                    updateTitleFn("Error!\nTry again\nlater!")
+                }
+            };
+
+            call.send();
+        }
+
+        function toDataURL(src, callback, outputFormat) {
+            var img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function () {
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                var dataURL;
+                canvas.height = this.naturalHeight;
+                canvas.width = this.naturalWidth;
+                ctx.drawImage(this, 0, 0);
+                dataURL = canvas.toDataURL(outputFormat);
+                callback(dataURL);
+            };
+            img.src = src;
+            if (img.complete || img.complete === undefined) {
+                img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+                img.src = src;
+            }
+        }
+
+
     }
 
 </script>
