@@ -6,7 +6,9 @@ StreamDeck is an awesome productivity tool which allows you almost infinite numb
 
 Weather Plugin gets and displays weather condition on your StreamDeck hourly from AccuWeather. Its dynamic background changes based on the weather. You can see the full list of backgrounds here https://developer.accuweather.com/weather-icons
 
-It is only for informational purposes and does not react presses. It runs in teh background and automatically updates itself at the end of every hour.
+The plugin is only for informational purposes and does not react key presses. It runs in the background and automatically updates itself at the end of every hour.
+
+This plugin is compatible with both Windows and Mac environments. It is written with the StreamDeck's SDK using JavaScript. 
 
 ## Install
 
