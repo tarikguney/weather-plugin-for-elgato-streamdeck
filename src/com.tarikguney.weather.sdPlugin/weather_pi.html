@@ -20,9 +20,11 @@
         <input class="sdpi-item-value" id="apiKey" required onblur="apiKey=event.target.value">
     </div>
     <div class="sdpi-item">
-        <div class="sdpi-item-label">About the API Key</div>
+        <div class="sdpi-item-label">Instructions</div>
         <details class="sdpi-item-value">
-            <p>Unfortunately, AccuWeather allows 50 requests per day to the their forecast API for free accounts. Therefore, you should get your own API Key. It is easy. Just create a new account and visit <a href="https://developer.accuweather.com/user/me/apps">https://developer.accuweather.com/user/me/apps</a> to get your API key by adding a new application.eam</p>
+            <p>You can learn more about this plugin and how to obtain an API key by visiting its Github page by <a
+                    href="#"
+                    onclick="openGithub()">clicking here.</a>
         </details>
     </div>
     <div class="sdpi-item">
@@ -61,8 +63,12 @@
                 $SD.api.sendToPlugin(uuid, actionName, payload);
             }
         }
-
     }
+    
+    function openGithub() {
+        $SD.api.openUrl($SD.actionInfo.context, "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck")
+    }
+    
 
 </script>
 
