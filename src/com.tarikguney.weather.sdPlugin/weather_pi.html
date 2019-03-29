@@ -40,21 +40,6 @@
             document.getElementById("zipCode").value = settings.zipCode;
             document.getElementById("apiKey").value = settings.apiKey;
         });
-
-
-       /* setTimeout(()=> {
-            let settings = $SD.actionInfo.payload.settings;
-            document.getElementById("zipCode").value = settings.zipCode;
-            document.getElementById("apiKey").value = settings.apiKey;
-        }, 1000);*/
-
-        $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
-            if (jsonObj.payload.settings.hasOwnProperty("zipCode")) {
-                let settings = jsonObj.payload.settings;
-                document.getElementById("zipCode").value = settings.zipCode;
-                document.getElementById("apiKey").value = settings.apiKey;
-            }
-        });
     }
 
     function sendToPlugin() {
