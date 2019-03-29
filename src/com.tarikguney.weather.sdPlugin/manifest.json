@@ -19,12 +19,12 @@
   "SDKVersion": 2,
   "Author": "Tarik Guney",
   "CodePath": "index.html",
-  "Description": "A beautiful open source weather plugin developed by Tarik Guney.",
+  "Description": "A beautiful open source weather plugin developed by Tarik Guney. You can find more information about this plugin at https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck/. Please report any issues you see on the project's Github page. I welcome any feedback.",
   "Name": "Weather",
   "Icon": "weather-icon",
   "URL": "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck",
   "PropertyInspectorPath": "weather_pi.html",
-  "Version": "1.0",
+  "Version": "1.2",
   "OS": [
     {
       "Platform": "mac",
