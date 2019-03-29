@@ -36,7 +36,15 @@
 
             // Initial call for the first time, then schedule for every 1 hours.
             setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode);
-            interval = setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode),
+
+            interval = setInterval(() => {
+                    // Enclosing the variables to avoid closure issues.
+                    let context = jsonObj.context;
+                    let apiKey = jsonObj.payload.apiKey;
+                    let zipCode = jsonObj.payload.zipCode;
+
+                    setTitleWithWeather(context, apiKey, zipCode);
+                },
                 moment.duration(1, 'hours').asMilliseconds());
         });
 
@@ -47,7 +55,10 @@
                     $SD.api.setTitle(context, result);
                     return;
                 }
-                $SD.api.setTitle(context, result.Mood + "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
+                
+                $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') + 
+                    "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
+                
                 let url = "https://developer.accuweather.com/sites/default/files/{Icon}-s.png";
                 toDataURL(url.replace("{Icon}", result.Icon),
                     function (dataUrl) {
@@ -87,7 +98,7 @@
                 if (call.readyState === 4 && call.status === 200) {
                     let response = JSON.parse(call.responseText);
                     updateTitleFn({
-                        "Mood": response[0].IconPhrase.replace(" ", "\n"),
+                        "Mood": response[0].IconPhrase,
                         "Icon": response[0].WeatherIcon,
                         "Temperature": response[0].Temperature
                     });
@@ -103,12 +114,12 @@
         }
 
         function toDataURL(src, callback, outputFormat) {
-            var img = new Image();
+            let img = new Image();
             img.crossOrigin = 'Anonymous';
             img.onload = function () {
-                var canvas = document.createElement('CANVAS');
-                var ctx = canvas.getContext('2d');
-                var dataURL;
+                let canvas = document.createElement('CANVAS');
+                let ctx = canvas.getContext('2d');
+                let dataURL;
                 canvas.height = this.naturalHeight;
                 canvas.width = this.naturalWidth;
                 ctx.drawImage(this, 0, 0);

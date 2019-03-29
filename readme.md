@@ -1,6 +1,6 @@
 # Weather Plugin for Elgato StreamDeck
 
-StreamDeck is an awesome productivity tool which allows you almost infinite number of customizations. Therefore, I wanted ot develop my own plugin to get updates about the weather.
+StreamDeck is an awesome productivity tool which allows you almost infinite number of customizations. Therefore, I wanted to develop my own plugin to get updates about the weather.
 
 ## What is this plugin about?
 
@@ -12,7 +12,7 @@ This plugin is compatible with both Windows and Mac environments. It is written 
 
 ## Install
 
-Go to https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck/releasesa and find the latest release. From there, download the `com.tarikguney.weather.streamDeckPlugin` file to your computer. Simply double click on it and it will be automatically installed and be available on StreamDeck application under Custom actions tab.
+Go to https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck/releases and find the latest release. From there, download the `com.tarikguney.weather.streamDeckPlugin` file to your computer. Simply double click on it and it will be automatically installed and be available on StreamDeck application under Custom actions tab.
 
 ## Settings
 
