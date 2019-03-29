@@ -8,6 +8,10 @@ Weather Plugin gets and displays weather condition on your StreamDeck hourly fro
 
 It is only for informational purposes and does not react presses. It runs in teh background and automatically updates itself at the end of every hour.
 
+## Install
+
+Go to https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck/releasesa and find the latest release. From there, download the `com.tarikguney.weather.streamDeckPlugin` file to your computer. Simply double click on it and it will be automatically installed and be available on StreamDeck application under Custom actions tab.
+
 ## Settings
 
 You can change the settings using the property inspector pane on StreamDeck application. Let's look at the image below which shows which settings are available and how the plugin looks when working:
