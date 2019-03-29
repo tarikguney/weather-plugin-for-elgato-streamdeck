@@ -10,7 +10,8 @@
 
 <body>
 <script>
-
+    var interval;
+    
     if ($SD) {
         const actionName = "com.tarikguney.weather.action";
 
@@ -22,18 +23,14 @@
             $SD.api.getSettings(jsonObj.context);
         });
 
-        $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
-            $SD.api.setSettings(jsonObj.context, {
-                zipCode: jsonObj.payload.zipCode,
-                apiKey: jsonObj.payload.apiKey
-            });
-
+        $SD.on(actionName + ".didReceiveSettings", function (jsonObj) {
             // Initial call for the first time, then schedule for every 1 hours.
-            setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode);
-            setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode),
+            setTitleWithWeather(jsonObj.context, jsonObj.payload.settings.apiKey, jsonObj.payload.settings.zipCode);
+            if (interval) {
+                clearInterval(interval);
+            }
+            interval = setInterval(() => setTitleWithWeather(jsonObj.context, jsonObj.payload.settings.apiKey, jsonObj.payload.settings.zipCode),
                 moment.duration(1, 'hours').asMilliseconds());
-
-            $SD.api.getSettings(jsonObj.context);
         });
 
         function setTitleWithWeather(context, apiKey, zipCode) {
