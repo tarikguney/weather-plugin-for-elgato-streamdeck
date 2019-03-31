@@ -7,7 +7,7 @@
         {
           "Image": "weather-icon",
           "TitleAlignment": "middle",
-          "FontSize": "11",
+          "FontSize": "9",
           "ShowTitle": true
         }
       ],

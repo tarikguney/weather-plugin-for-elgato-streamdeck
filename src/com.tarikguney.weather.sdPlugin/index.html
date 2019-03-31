@@ -71,12 +71,13 @@
             call.open("GET", locationEndPoint.replace("{apiKey}", settings.apiKey)
                 .replace("{zipCode}", settings.zipCode)
                 .replace("{countryCode}", settings.countryCode));
+            
             call.onreadystatechange = function () {
                 if (call.readyState === 4 && call.status === 200) {
                     let response = JSON.parse(call.responseText);
                     let locationKey = response[0].Key;
 
-                    getWeather(apiKey, locationKey, updateTitleFn);
+                    getWeather(settings.apiKey, locationKey, updateTitleFn);
                 } else if (call.readyState === 4 && call.status === 503) {
                     // Exceeded the number of allowed calls from AccuWeather Free API.
                     updateTitleFn("Exceeded...!")

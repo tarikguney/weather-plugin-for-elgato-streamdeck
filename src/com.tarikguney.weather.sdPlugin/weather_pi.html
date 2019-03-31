@@ -33,6 +33,11 @@
         <div class="sdpi-item-label">Zip Code</div>
         <input class="sdpi-item-value" id="zipCode" required>
     </div>
+    <div class="sdpi-item" id="zipCodeMessage" style="display: none">
+        <details class="message caution" >
+            <summary>Only number characters allowed! Try after removing the letters.</summary>
+        </details>
+    </div>
     <div class="sdpi-item">
         <button class="sdpi-item-value" id="updateButton">Update</button>
     </div>
@@ -63,12 +68,19 @@
 
     $(document).ready(function () {
 
-        $("#saveButton").click(function () {
+        $("#updateButton").click(function () {
             // Sending the saved settings to the plugin from property inspector.
             let zipCode = $("#zipCode").val();
             let apiKey = $("#apiKey").val();
             let countryCode = $("#countryCode").val();
 
+            if (isNaN(zipCode)) {
+                $("#zipCodeMessage").show();
+                return;
+            }
+
+            $("#zipCodeMessage").hide();
+            
             if (zipCode && apiKey && countryCode) {
                 if ($SD && $SD.connection) {
                     let payload = {};
@@ -87,15 +99,6 @@
     function openGithub() {
         $SD.api.openUrl($SD.actionInfo.context, "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck")
     }
-
-    /*  function getRegions() {
-          $.getJSON("http://dataservice.accuweather.com/locations/v1/regions", {apikey: apiKey}).done(function (data) {
-              $.each(data, function (obj) {
-                  $("#regionSelect").append("<option/>").val(obj.ID).text(obj.EnglishName);
-              });
-          });
-      }*/
-
 
 </script>
 
