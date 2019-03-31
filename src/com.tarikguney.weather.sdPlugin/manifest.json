@@ -7,7 +7,7 @@
         {
           "Image": "weather-icon",
           "TitleAlignment": "middle",
-          "FontSize": "12",
+          "FontSize": "11",
           "ShowTitle": true
         }
       ],
@@ -24,7 +24,7 @@
   "Icon": "weather-icon",
   "URL": "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck",
   "PropertyInspectorPath": "weather_pi.html",
-  "Version": "1.2",
+  "Version": "1.3",
   "OS": [
     {
       "Platform": "mac",

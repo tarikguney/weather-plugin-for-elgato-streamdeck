@@ -11,7 +11,7 @@
 <body>
 <script>
 
-    var interval;
+    var intervals = {};
 
     if ($SD) {
         const actionName = "com.tarikguney.weather.action";
@@ -25,32 +25,29 @@
         });
 
         $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
-            $SD.api.setSettings(jsonObj.context, {
-                zipCode: jsonObj.payload.zipCode,
-                apiKey: jsonObj.payload.apiKey
-            });
+            $SD.api.setSettings(jsonObj.context, jsonObj.payload);
 
-            if (interval) {
+            if (intervals[jsonObj.context]) {
+                let interval = intervals[jsonObj.context];
                 clearInterval(interval);
             }
 
             // Initial call for the first time, then schedule for every 1 hours.
-            setTitleWithWeather(jsonObj.context, jsonObj.payload.apiKey, jsonObj.payload.zipCode);
+            setTitleWithWeatherStatus(jsonObj.context, jsonObj.payload);
 
-            interval = setInterval(() => {
-                    // Enclosing the variables to avoid closure issues.
-                    let context = jsonObj.context;
-                    let apiKey = jsonObj.payload.apiKey;
-                    let zipCode = jsonObj.payload.zipCode;
-
-                    setTitleWithWeather(context, apiKey, zipCode);
+            intervals[jsonObj.context] = setInterval(() => {
+                let settings = {};
+                // Just making sure we are not hurt by closure.
+                Object.assign(jsonObj.payload, settings);
+                    setTitleWithWeatherStatus(jsonObj.context, settings);
                 },
                 moment.duration(1, 'hours').asMilliseconds());
         });
 
-        function setTitleWithWeather(context, apiKey, zipCode) {
+        function setTitleWithWeatherStatus(context, settings) {
             $SD.api.setTitle(context, "Updating...");
-            getLocationCode(zipCode, apiKey, result => {
+            
+            getLocationCode(settings, result => {
                 if (!result.hasOwnProperty("Mood")) {
                     $SD.api.setTitle(context, result);
                     return;
@@ -68,10 +65,12 @@
             });
         }
 
-        function getLocationCode(zipCode, apiKey, updateTitleFn) {
-            let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/us/search?apikey={apiKey}&q={zipCode}";
+        function getLocationCode(settings, updateTitleFn) {
+            let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/{countryCode}/search?apikey={apiKey}&q={zipCode}";
             let call = new XMLHttpRequest();
-            call.open("GET", locationEndPoint.replace("{apiKey}", apiKey).replace("{zipCode}", zipCode));
+            call.open("GET", locationEndPoint.replace("{apiKey}", settings.apiKey)
+                .replace("{zipCode}", settings.zipCode)
+                .replace("{countryCode}", settings.countryCode));
             call.onreadystatechange = function () {
                 if (call.readyState === 4 && call.status === 200) {
                     let response = JSON.parse(call.responseText);
@@ -104,7 +103,7 @@
                     });
                 } else if (call.readyState === 4 && call.status === 503) {
                     // Exceeded the number of allowed calls from AccuWeather Free API.
-                    updateTitleFn("Exceeded...!")
+                    updateTitleFn("Exceeded number of calls!")
                 } else if (call.readyState === 4) {
                     updateTitleFn("Error!\nTry again\nlater!")
                 }

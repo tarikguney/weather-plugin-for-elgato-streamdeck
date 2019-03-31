@@ -5,37 +5,41 @@
     <meta charset="utf-8"/>
     <title>com.tarikguney.weather</title>
     <link rel="stylesheet" href="sdpi.css">
+    <script src="jquery-3.3.1.js"></script>
     <script src="common.js"></script>
 </head>
 
 <body>
 <div class="sdpi-wrapper">
     <div class="sdpi-item">
-        <div class="sdpi-item-label">Zip Code</div>
-        <input class="sdpi-item-value" id="zipCode" required onblur="zipCode=event.target.value">
-
-    </div>
-    <div class="sdpi-item">
         <div class="sdpi-item-label">AccuWeather API Key</div>
-        <input class="sdpi-item-value" id="apiKey" required onblur="apiKey=event.target.value">
+        <input class="sdpi-item-value" id="apiKey" required>
     </div>
     <div class="sdpi-item">
         <div class="sdpi-item-label">Instructions</div>
         <details class="sdpi-item-value">
-            <p>You can learn more about this plugin and how to obtain an API key by visiting its Github page by <a
-                    href="#"
-                    onclick="openGithub()">clicking here.</a>
+            <p>You can learn more about this plugin and how to obtain an API key and Country Code by visiting its Github
+                page by <a
+                        href="#"
+                        onclick="openGithub()">clicking here.</a>
         </details>
     </div>
+    <div class="sdpi-heading">LOCATION SELECTION</div>
     <div class="sdpi-item">
-        <button class="sdpi-item-value" id="saveButton" onclick="sendToPlugin()">Save</button>
+        <div class="sdpi-item-label">Country Code</div>
+        <input class="sdpi-item-value" id="countryCode" required>
+    </div>
+    <div class="sdpi-item">
+        <div class="sdpi-item-label">Zip Code</div>
+        <input class="sdpi-item-value" id="zipCode" required>
+    </div>
+    <div class="sdpi-item">
+        <button class="sdpi-item-value" id="updateButton">Update</button>
     </div>
 </div>
 
 <script>
     let uuid = '',
-        zipCode = "",
-        apiKey = "",
         actionName = "";
 
     if ($SD) {
@@ -46,29 +50,52 @@
             }
             let settings = $SD.actionInfo.payload.settings;
             if (settings.zipCode) {
-                document.getElementById("zipCode").value = settings.zipCode;
+                $("#zipCode").val(settings.zipCode);
             }
             if (settings.apiKey) {
-                document.getElementById("apiKey").value = settings.apiKey;
+                $("#apiKey").val(settings.apiKey);
+            }
+            if (settings.countryCode) {
+                $("#countryCode").val(settings.countryCode);
             }
         });
     }
 
-    function sendToPlugin() {
-        if (zipCode && apiKey) {
-            if ($SD && $SD.connection) {
-                let payload = {};
-                payload.zipCode = zipCode;
-                payload.apiKey = apiKey;
-                $SD.api.sendToPlugin(uuid, actionName, payload);
+    $(document).ready(function () {
+
+        $("#saveButton").click(function () {
+            // Sending the saved settings to the plugin from property inspector.
+            let zipCode = $("#zipCode").val();
+            let apiKey = $("#apiKey").val();
+            let countryCode = $("#countryCode").val();
+
+            if (zipCode && apiKey && countryCode) {
+                if ($SD && $SD.connection) {
+                    let payload = {};
+
+                    payload.zipCode = zipCode;
+                    payload.apiKey = apiKey;
+                    payload.countryCode = countryCode;
+
+                    $SD.api.sendToPlugin(uuid, actionName, payload);
+                }
             }
-        }
-    }
-    
+        });
+
+    });
+
     function openGithub() {
         $SD.api.openUrl($SD.actionInfo.context, "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck")
     }
-    
+
+    /*  function getRegions() {
+          $.getJSON("http://dataservice.accuweather.com/locations/v1/regions", {apikey: apiKey}).done(function (data) {
+              $.each(data, function (obj) {
+                  $("#regionSelect").append("<option/>").val(obj.ID).text(obj.EnglishName);
+              });
+          });
+      }*/
+
 
 </script>
 
