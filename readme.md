@@ -24,11 +24,6 @@ You can change the settings using the property inspector pane on StreamDeck appl
 
 It does not have any effect. The title is automatically set with the current weather condition including the temperature.
 
-
-#### `Zip Code`
-
-It is pretty clear as to what it is, however, only the USA Zip Codes are supported currently. This field is also known as Postal Code in different parts of the world.
-
 #### `AccuWeather API Key`
 
 Unfortunately, AccuWeather offers only 50 calls per day for each plugin with free AccuWeather accounts. This plugin makes calls to the AccuWeather API to get the hourly weather information to display it on the StreamDeck canvas. Therefore, you need to create your own account and obtain API Key. It is really simple:
@@ -39,6 +34,17 @@ Unfortunately, AccuWeather offers only 50 calls per day for each plugin with fre
 Check out the image below:
 
 ![api-key-2](key-obtain.png)
+
+#### `Country Code`
+
+AccuWeather, when forming the API Url, expects a country code to be passed as part of the Url. In order to reduce the calls to keep the daily number of calls within limits, I need you to find your country code in this list: https://developer.accuweather.com/countries-by-region and copy that to the Country Code field. That's all!
+
+A country code is a shortened version of the country name. For instance, it is `US` for the United States of Ameriica, and `DE` for `Germany`.
+
+#### `Zip Code`
+
+It is pretty clear as to what it is, however, only the USA Zip Codes are supported currently. This field is also known as Postal Code in different parts of the world.
+
 
 ## Problem?
 
