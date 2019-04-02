@@ -6,6 +6,7 @@
     <meta charset="utf-8"/>
     <script src="common.js"></script>
     <script src="moment.js"></script>
+    <script src="jquery-3.3.1.js"></script>
 </head>
 
 <body>
@@ -36,9 +37,9 @@
             setTitleWithWeatherStatus(jsonObj.context, jsonObj.payload);
 
             intervals[jsonObj.context] = setInterval(() => {
-                let settings = {};
-                // Just making sure we are not hurt by closure.
-                Object.assign(jsonObj.payload, settings);
+                    let settings = {};
+                    // Just making sure we are not hurt by closure.
+                    Object.assign(jsonObj.payload, settings);
                     setTitleWithWeatherStatus(jsonObj.context, settings);
                 },
                 moment.duration(1, 'hours').asMilliseconds());
@@ -46,16 +47,16 @@
 
         function setTitleWithWeatherStatus(context, settings) {
             $SD.api.setTitle(context, "Updating...");
-            
+
             getLocationCode(settings, result => {
                 if (!result.hasOwnProperty("Mood")) {
                     $SD.api.setTitle(context, result);
                     return;
                 }
-                
-                $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') + 
+
+                $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') +
                     "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
-                
+
                 let url = "https://developer.accuweather.com/sites/default/files/{Icon}-s.png";
                 toDataURL(url.replace("{Icon}", result.Icon),
                     function (dataUrl) {
@@ -66,51 +67,41 @@
         }
 
         function getLocationCode(settings, updateTitleFn) {
-            let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/{countryCode}/search?apikey={apiKey}&q={zipCode}";
-            let call = new XMLHttpRequest();
-            call.open("GET", locationEndPoint.replace("{apiKey}", settings.apiKey)
-                .replace("{zipCode}", settings.zipCode)
-                .replace("{countryCode}", settings.countryCode));
-            
-            call.onreadystatechange = function () {
-                if (call.readyState === 4 && call.status === 200) {
-                    let response = JSON.parse(call.responseText);
-                    let locationKey = response[0].Key;
+            let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/{countryCode}/search"
+                .replace("{countryCode}", settings.countryCode);
 
-                    getWeather(settings.apiKey, locationKey, updateTitleFn);
-                } else if (call.readyState === 4 && call.status === 503) {
-                    // Exceeded the number of allowed calls from AccuWeather Free API.
-                    updateTitleFn("Exceeded...!")
-                } else if (call.readyState === 4) {
-                    updateTitleFn("Error!\nTry again\nlater!")
-                }
-            };
-
-            call.send();
+            $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: settings.zipCode})
+                .done(function (response) {
+                    getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                })
+                .fail(function (jqxhr, textStatus, error) {
+                    if (jqxhr.status === 503) {
+                        updateTitleFn("Exceeded...!")
+                    } else {
+                        updateTitleFn(error);
+                    }
+                });
         }
 
         function getWeather(apiKey, locationKey, updateTitleFn) {
-            let endpoint = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{locationKey}?apikey={apiKey}";
-            let call = new XMLHttpRequest();
-            call.open("GET", endpoint.replace("{apiKey}", apiKey).replace("{locationKey}", locationKey));
+            let endpoint = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{locationKey}"
+                .replace("{locationKey}", locationKey);
 
-            call.onreadystatechange = function () {
-                if (call.readyState === 4 && call.status === 200) {
-                    let response = JSON.parse(call.responseText);
+            $.getJSON(endpoint, {apikey: apiKey})
+                .done(function (response) {
                     updateTitleFn({
                         "Mood": response[0].IconPhrase,
                         "Icon": response[0].WeatherIcon,
                         "Temperature": response[0].Temperature
                     });
-                } else if (call.readyState === 4 && call.status === 503) {
-                    // Exceeded the number of allowed calls from AccuWeather Free API.
-                    updateTitleFn("Exceeded number of calls!")
-                } else if (call.readyState === 4) {
-                    updateTitleFn("Error!\nTry again\nlater!")
-                }
-            };
-
-            call.send();
+                })
+                .fail(function (jqxhr, textStatus, error) {
+                    if (jqxhr.status === 503) {
+                        updateTitleFn("Exceeded number of calls!")
+                    } else {
+                        updateTitleFn("Error!\nTry again\nlater!")
+                    }
+                });
         }
 
         function toDataURL(src, callback, outputFormat) {
