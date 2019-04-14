@@ -37,9 +37,7 @@ Check out the image below:
 
 #### `Country Code`
 
-AccuWeather, when forming the API Url, expects a country code to be passed as part of the Url. In order to reduce the calls to keep the daily number of calls within limits, I need you to find your country code in this list: https://developer.accuweather.com/countries-by-region and copy that to the Country Code field. That's all!
-
-A country code is a shortened version of the country name. For instance, it is `US` for the United States of Ameriica, and `DE` for `Germany`.
+Weather Plugin support international weather forecast report. You can choose whichever country you are in. If you are in the US, the `Zip Code` field will appear. If you are outside of the US, then the `City` field will appear. For instance, type in `London` for the United Kingdom.
 
 #### `Zip Code`
 
