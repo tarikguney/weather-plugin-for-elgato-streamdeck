@@ -16,6 +16,11 @@
         <div class="sdpi-item-label">AccuWeather API Key</div>
         <input class="sdpi-item-value" id="apiKey" required>
     </div>
+    <div class="sdpi-item" id="apiKeyValidationMessage" style="display: none">
+        <details class="message caution">
+            <summary>API is required. Please check the instructions to see how you can obtain it.</summary>
+        </details>
+    </div>
     <div class="sdpi-item">
         <div class="sdpi-item-label">Instructions</div>
         <details class="sdpi-item-value">
@@ -29,7 +34,6 @@
     <div class="sdpi-item" id="countryCodeContainer">
         <div class="sdpi-item-label">Country</div>
         <select class="sdpi-item-value select" id="countryCode">
-
         </select>
     </div>
     <div class="sdpi-item" id="zipCodeContainer" style="display: none;">
@@ -105,11 +109,12 @@
         $("#updateButton").click(function () {
             // Sending the saved settings to the plugin from property inspector.
             let apiKey = $("#apiKey").val();
-            let countryCode = $("#countryCode:selected").val();
+            let countryCode = $("#countryCode option:selected").val();
             console.log(countryCode);
 
-            let zipCode = -1;
+            let zipCode = 0;
             let city = "";
+
             if (isUSSelected()) {
                 let zipCode = $("#zipCode").val();
                 if (isNaN(zipCode)) {
@@ -120,25 +125,29 @@
                 city = $("#city").val();
                 if (!city) {
                     $("#cityMessage").show();
+                    return;
                 } else {
                     $("#cityMessage").hide();
                 }
             }
 
+            if (!$("#apiKey").val()) {
+                $("#apiKeyValidationMessage").show();
+            } else {
+                $("#apiKeyValidationMessage").hide();
+            }
 
             $("#zipCodeMessage").hide();
 
-            if (zipCode && apiKey && countryCode) {
-                if ($SD && $SD.connection) {
-                    let payload = {};
+            if ($SD && $SD.connection) {
+                let payload = {};
 
-                    payload.zipCode = zipCode;
-                    payload.apiKey = apiKey;
-                    payload.city = city;
-                    payload.countryCode = countryCode;
+                payload.zipCode = zipCode;
+                payload.apiKey = apiKey;
+                payload.city = city;
+                payload.countryCode = countryCode;
 
-                    $SD.api.sendToPlugin(uuid, actionName, payload);
-                }
+                $SD.api.sendToPlugin(uuid, actionName, payload);
             }
         });
     });
