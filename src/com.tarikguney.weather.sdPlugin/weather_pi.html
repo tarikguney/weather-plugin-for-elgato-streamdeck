@@ -133,6 +133,7 @@
 
             if (!$("#apiKey").val()) {
                 $("#apiKeyValidationMessage").show();
+                return;
             } else {
                 $("#apiKeyValidationMessage").hide();
             }
@@ -151,7 +152,6 @@
             }
         });
     });
-
 
     function openGithub() {
         $SD.api.openUrl($SD.actionInfo.context, "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck")
