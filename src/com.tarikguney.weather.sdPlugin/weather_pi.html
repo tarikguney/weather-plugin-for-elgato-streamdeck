@@ -111,7 +111,7 @@
                 city = $("#city").val();
                 if (!city) {
                     $("#cityMessage").show();
-                }else{
+                } else {
                     $("#cityMessage").hide();
                 }
             }
@@ -125,8 +125,8 @@
 
                     payload.zipCode = zipCode;
                     payload.apiKey = apiKey;
-                    payload.city =
-                        payload.countryCode = countryCode;
+                    payload.city = city;
+                    payload.countryCode = countryCode;
 
                     $SD.api.sendToPlugin(uuid, actionName, payload);
                 }

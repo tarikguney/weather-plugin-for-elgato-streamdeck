@@ -12,7 +12,7 @@
 <body>
 <script>
 
-    var intervals = {};
+    let intervals = {};
 
     if ($SD) {
         const actionName = "com.tarikguney.weather.action";
@@ -48,29 +48,52 @@
         function setTitleWithWeatherStatus(context, settings) {
             $SD.api.setTitle(context, "Updating...");
 
-            getLocationCode(settings, result => {
-                if (!result.hasOwnProperty("Mood")) {
-                    $SD.api.setTitle(context, result);
-                    return;
-                }
-
-                $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') +
-                    "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
-
-                let url = "https://developer.accuweather.com/sites/default/files/{Icon}-s.png";
-                toDataURL(url.replace("{Icon}", result.Icon),
-                    function (dataUrl) {
-                        $SD.api.setImage(context, dataUrl);
-                    }
-                );
-            });
+            if (settings.zipCode) {
+                getWeatherForZipcode(settings, resultCallback);
+            } else if (settings.city) {
+                getWeatherForCity(settings, resultCallback);
+            }
         }
 
-        function getLocationCode(settings, updateTitleFn) {
+        function resultCallback(result) {
+            if (!result.hasOwnProperty("Mood")) {
+                $SD.api.setTitle(context, result);
+                return;
+            }
+
+            $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') +
+                "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
+
+            let url = "https://developer.accuweather.com/sites/default/files/{Icon}-s.png";
+            toDataURL(url.replace("{Icon}", result.Icon),
+                function (dataUrl) {
+                    $SD.api.setImage(context, dataUrl);
+                }
+            );
+        }
+
+        function getWeatherForZipcode(settings, updateTitleFn) {
             let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/{countryCode}/search"
                 .replace("{countryCode}", settings.countryCode);
 
             $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: settings.zipCode})
+                .done(function (response) {
+                    getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                })
+                .fail(function (jqxhr, textStatus, error) {
+                    if (jqxhr.status === 503) {
+                        updateTitleFn("Exceeded...!")
+                    } else {
+                        updateTitleFn(error);
+                    }
+                });
+        }
+
+        function getWeatherForCity(settings, updateTitleFn) {
+            let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/cities/{countryCode}/search"
+                .replace("{countryCode}", settings.countryCode);
+
+            $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: encodeURIComponent(settings.city)})
                 .done(function (response) {
                     getWeather(settings.apiKey, response[0].Key, updateTitleFn);
                 })
