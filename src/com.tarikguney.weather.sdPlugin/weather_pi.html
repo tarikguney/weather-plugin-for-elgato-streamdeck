@@ -60,7 +60,7 @@
 </div>
 
 <script>
-    let uuid = '',
+    let uuid = "",
         actionName = "";
 
     if ($SD) {
@@ -70,14 +70,22 @@
                 actionName = jsonObj.actionInfo.action;
             }
             let settings = $SD.actionInfo.payload.settings;
-            if (settings.zipCode) {
-                $("#zipCode").val(settings.zipCode);
-            }
+
             if (settings.apiKey) {
                 $("#apiKey").val(settings.apiKey);
             }
             if (settings.countryCode) {
-                $("#countryCode").val(settings.countryCode);
+                $('#countryCode option[value=' + settings.countryCode + ']')
+                    .prop('selected', 'selected').change();
+            }
+
+            let isUsSelected = settings.countryCode &&
+                settings.countryCode.toLowerCase() === "us";
+            
+            if (isUsSelected && settings.zipCode) {
+                $("#zipCode").val(settings.zipCode);
+            } else if (!isUsSelected && settings.city) {
+                $("#city").val(settings.city);
             }
         });
     }
@@ -116,7 +124,7 @@
             let city = "";
 
             if (isUSSelected()) {
-                let zipCode = $("#zipCode").val();
+                zipCode = $("#zipCode").val();
                 if (isNaN(zipCode)) {
                     $("#zipCodeMessage").show();
                     return;
