@@ -42,7 +42,7 @@
     </div>
     <div class="sdpi-item" id="zipCodeMessage" style="display: none">
         <details class="message caution">
-            <summary>Only number characters allowed! Try after removing the letters.</summary>
+            <summary>Zip Code is required and only accepts numeric values!</summary>
         </details>
     </div>
     <div class="sdpi-item" id="cityContainer">
@@ -81,7 +81,7 @@
 
             let isUsSelected = settings.countryCode &&
                 settings.countryCode.toLowerCase() === "us";
-            
+
             if (isUsSelected && settings.zipCode) {
                 $("#zipCode").val(settings.zipCode);
             } else if (!isUsSelected && settings.city) {
@@ -103,14 +103,48 @@
                 .text(countries[index].name));
         });
 
+        $("#apiKey").on("blur", function () {
+            if (!$("#apiKey").val()) {
+                $("#apiKeyValidationMessage").show();
+            } else {
+                $("#apiKeyValidationMessage").hide();
+            }
+        });
+
         $("#countryCode").on("change", function () {
 
             if (isUSSelected()) {
                 $("#zipCodeContainer").show();
+                
                 $("#cityContainer").hide();
+                $("#cityMessage").hide();
+                $("#zipCodeMessage").hide();
             } else {
-                $("#zipCodeContainer").hide();
                 $("#cityContainer").show();
+                
+                $("#zipCodeContainer").hide();
+                $("#zipCodeMessage").hide();
+                $("#cityMessage").hide();
+            }
+        });
+
+        $("#zipCode").on("blur", function () {
+            if (isUSSelected()) {
+                if (!$("#zipCode").val() || isNaN($("#zipCode").val())) {
+                    $("#zipCodeMessage").show();
+                } else {
+                    $("#zipCodeMessage").hide();
+                }
+            }
+        });
+
+        $("#city").on("blur", function () {
+            if (!isUSSelected()) {
+                if ($("#city").val()) {
+                    $("#cityMessage").hide();
+                } else {
+                    $("#cityMessage").show();
+                }
             }
         });
 
@@ -118,35 +152,26 @@
             // Sending the saved settings to the plugin from property inspector.
             let apiKey = $("#apiKey").val();
             let countryCode = $("#countryCode option:selected").val();
-            console.log(countryCode);
-
             let zipCode = 0;
             let city = "";
 
             if (isUSSelected()) {
                 zipCode = $("#zipCode").val();
-                if (isNaN(zipCode)) {
-                    $("#zipCodeMessage").show();
+                city = "";
+                if (!zipCode || isNaN(zipCode)) {
                     return;
                 }
             } else {
                 city = $("#city").val();
+                zipCode = 0;
                 if (!city) {
-                    $("#cityMessage").show();
                     return;
-                } else {
-                    $("#cityMessage").hide();
                 }
             }
 
             if (!$("#apiKey").val()) {
-                $("#apiKeyValidationMessage").show();
                 return;
-            } else {
-                $("#apiKeyValidationMessage").hide();
             }
-
-            $("#zipCodeMessage").hide();
 
             if ($SD && $SD.connection) {
                 let payload = {};
