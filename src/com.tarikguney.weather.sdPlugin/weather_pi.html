@@ -40,12 +40,12 @@
         </details>
     </div>
     <div class="sdpi-item" id="cityContainer">
-        <div class="sdpi-item-label">Zip Code</div>
+        <div class="sdpi-item-label">City</div>
         <input class="sdpi-item-value" id="city" required>
     </div>
     <div class="sdpi-item" id="cityMessage" style="display: none">
         <details class="message caution">
-            <summary>Only number characters allowed! Try after removing the letters.</summary>
+            <summary>City is required!</summary>
         </details>
     </div>
     <div class="sdpi-item">
@@ -76,11 +76,16 @@
         });
     }
 
+    function isUSSelected() {
+        let countryCode = $("#countryCode").val();
+        return countryCode.toLowerCase() === "us";
+    }
+
     $(document).ready(function () {
 
         $("#countryCode").on("blur", function () {
-            let countryCode = $("#countryCode").val();
-            if (countryCode.toLowerCase() === "us") {
+
+            if (isUSSelected()) {
                 $("#zipCodeContainer").show();
                 $("#cityContainer").hide();
             } else {
@@ -91,14 +96,26 @@
 
         $("#updateButton").click(function () {
             // Sending the saved settings to the plugin from property inspector.
-            let zipCode = $("#zipCode").val();
             let apiKey = $("#apiKey").val();
             let countryCode = $("#countryCode").val();
 
-            if (isNaN(zipCode)) {
-                $("#zipCodeMessage").show();
-                return;
+            let zipCode = -1;
+            let city = "";
+            if (isUSSelected()) {
+                let zipCode = $("#zipCode").val();
+                if (isNaN(zipCode)) {
+                    $("#zipCodeMessage").show();
+                    return;
+                }
+            } else {
+                city = $("#city").val();
+                if (!city) {
+                    $("#cityMessage").show();
+                }else{
+                    $("#cityMessage").hide();
+                }
             }
+
 
             $("#zipCodeMessage").hide();
 
@@ -108,14 +125,15 @@
 
                     payload.zipCode = zipCode;
                     payload.apiKey = apiKey;
-                    payload.countryCode = countryCode;
+                    payload.city =
+                        payload.countryCode = countryCode;
 
                     $SD.api.sendToPlugin(uuid, actionName, payload);
                 }
             }
         });
-
     });
+
 
     function openGithub() {
         $SD.api.openUrl($SD.actionInfo.context, "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck")
