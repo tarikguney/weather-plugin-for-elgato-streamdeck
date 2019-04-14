@@ -26,11 +26,13 @@
         </details>
     </div>
     <div class="sdpi-heading">LOCATION SELECTION</div>
-    <div class="sdpi-item">
-        <div class="sdpi-item-label">Country Code</div>
-        <input class="sdpi-item-value" id="countryCode" required>
+    <div class="sdpi-item" id="countryCodeContainer">
+        <div class="sdpi-item-label">Country</div>
+        <select class="sdpi-item-value select" id="countryCode">
+
+        </select>
     </div>
-    <div class="sdpi-item" id="zipCodeContainer">
+    <div class="sdpi-item" id="zipCodeContainer" style="display: none;">
         <div class="sdpi-item-label">Zip Code</div>
         <input class="sdpi-item-value" id="zipCode" required>
     </div>
@@ -83,7 +85,13 @@
 
     $(document).ready(function () {
 
-        $("#countryCode").on("blur", function () {
+        $.each(countries, function (index) {
+            $("#countryCode").append($("<option/>")
+                .val(countries[index].code)
+                .text(countries[index].name));
+        });
+
+        $("#countryCode").on("change", function () {
 
             if (isUSSelected()) {
                 $("#zipCodeContainer").show();
@@ -97,7 +105,8 @@
         $("#updateButton").click(function () {
             // Sending the saved settings to the plugin from property inspector.
             let apiKey = $("#apiKey").val();
-            let countryCode = $("#countryCode").val();
+            let countryCode = $("#countryCode:selected").val();
+            console.log(countryCode);
 
             let zipCode = -1;
             let city = "";
