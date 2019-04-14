@@ -49,13 +49,13 @@
             $SD.api.setTitle(context, "Updating...");
 
             if (settings.zipCode) {
-                getWeatherForZipcode(settings, resultCallback);
+                getWeatherForZipcode(settings, result => resultCallback(result, context));
             } else if (settings.city) {
-                getWeatherForCity(settings, resultCallback);
+                getWeatherForCity(settings, result => resultCallback(result, context));
             }
         }
 
-        function resultCallback(result) {
+        function resultCallback(result, context) {
             if (!result.hasOwnProperty("Mood")) {
                 $SD.api.setTitle(context, result);
                 return;
@@ -71,14 +71,18 @@
                 }
             );
         }
-
+        
         function getWeatherForZipcode(settings, updateTitleFn) {
             let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/{countryCode}/search"
                 .replace("{countryCode}", settings.countryCode);
 
             $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: settings.zipCode})
                 .done(function (response) {
-                    getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                    if (response.length > 0 && response[0].Key) {
+                        getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                    } else {
+                        updateTitleFn("Location\nnot\nfound!");
+                    }
                 })
                 .fail(function (jqxhr, textStatus, error) {
                     if (jqxhr.status === 503) {
@@ -95,7 +99,11 @@
 
             $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: encodeURIComponent(settings.city)})
                 .done(function (response) {
-                    getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                    if (response.length > 0 && response[0].Key) {
+                        getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                    } else {
+                        updateTitleFn("Location\nnot\nfound!");
+                    }
                 })
                 .fail(function (jqxhr, textStatus, error) {
                     if (jqxhr.status === 503) {
