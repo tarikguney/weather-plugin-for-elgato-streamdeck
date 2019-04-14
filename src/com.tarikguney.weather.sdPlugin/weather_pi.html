@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="sdpi.css">
     <script src="jquery-3.3.1.js"></script>
     <script src="common.js"></script>
+    <script src="countries.js"></script>
 </head>
 
 <body>
@@ -29,12 +30,21 @@
         <div class="sdpi-item-label">Country Code</div>
         <input class="sdpi-item-value" id="countryCode" required>
     </div>
-    <div class="sdpi-item">
+    <div class="sdpi-item" id="zipCodeContainer">
         <div class="sdpi-item-label">Zip Code</div>
         <input class="sdpi-item-value" id="zipCode" required>
     </div>
     <div class="sdpi-item" id="zipCodeMessage" style="display: none">
-        <details class="message caution" >
+        <details class="message caution">
+            <summary>Only number characters allowed! Try after removing the letters.</summary>
+        </details>
+    </div>
+    <div class="sdpi-item" id="cityContainer">
+        <div class="sdpi-item-label">Zip Code</div>
+        <input class="sdpi-item-value" id="city" required>
+    </div>
+    <div class="sdpi-item" id="cityMessage" style="display: none">
+        <details class="message caution">
             <summary>Only number characters allowed! Try after removing the letters.</summary>
         </details>
     </div>
@@ -68,6 +78,17 @@
 
     $(document).ready(function () {
 
+        $("#countryCode").on("blur", function () {
+            let countryCode = $("#countryCode").val();
+            if (countryCode.toLowerCase() === "us") {
+                $("#zipCodeContainer").show();
+                $("#cityContainer").hide();
+            } else {
+                $("#zipCodeContainer").hide();
+                $("#cityContainer").show();
+            }
+        });
+
         $("#updateButton").click(function () {
             // Sending the saved settings to the plugin from property inspector.
             let zipCode = $("#zipCode").val();
@@ -80,7 +101,7 @@
             }
 
             $("#zipCodeMessage").hide();
-            
+
             if (zipCode && apiKey && countryCode) {
                 if ($SD && $SD.connection) {
                     let payload = {};
