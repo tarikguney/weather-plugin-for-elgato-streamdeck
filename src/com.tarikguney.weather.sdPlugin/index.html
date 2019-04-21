@@ -61,10 +61,13 @@
                 return;
             }
 
+            // If the Celsius is selected by the user, then converting the displayed temperature and unit to Celsius.
+            // The default is F, which is 0. So, no need to touch anything if it is selected.
             if (result.DegreeType === 1) {
                 result.Temperature.Value = convertToCelsius(result.Temperature.Value);
+                result.Temperature.Unit = "C";
             }
-            
+
             $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') +
                 "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
 
@@ -75,7 +78,7 @@
                 }
             );
         }
-        
+
         function getWeatherForZipcode(settings, updateTitleFn) {
             let locationEndPoint = "http://dataservice.accuweather.com/locations/v1/postalcodes/{countryCode}/search"
                 .replace("{countryCode}", settings.countryCode);
@@ -159,13 +162,9 @@
                 img.src = src;
             }
         }
-        
-        function convertToCelsius(fahrenheit){
-           return (fahrenheit-32) * (5/9);
-        }
 
-        function convertToFahrenheit(celsius) {
-            return (celsius * 9/5) + 32;
+        function convertToCelsius(fahrenheit) {
+            return (fahrenheit - 32) * (5 / 9);
         }
     }
 

@@ -24,7 +24,7 @@
   "Icon": "weather-icon",
   "URL": "https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck",
   "PropertyInspectorPath": "weather_pi.html",
-  "Version": "2.0",
+  "Version": "2.1",
   "OS": [
     {
       "Platform": "mac",
