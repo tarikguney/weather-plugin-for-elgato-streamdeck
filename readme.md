@@ -6,13 +6,15 @@ StreamDeck is an awesome productivity tool which allows you almost infinite numb
 
 Weather Plugin gets and displays weather condition on your StreamDeck hourly from AccuWeather. Its dynamic background changes based on the weather. You can see the full list of backgrounds here https://developer.accuweather.com/weather-icons
 
-The plugin is only for informational purposes and does not react key presses. It runs in the background and automatically updates itself at the end of every hour.
-
 This plugin is compatible with both Windows and Mac environments. It is written with the StreamDeck's SDK using JavaScript. 
 
 ## Install
 
 Go to https://github.com/tarikguney/weather-plugin-for-elgato-streamdeck/releases and find the latest release. From there, download the `com.tarikguney.weather.streamDeckPlugin` file to your computer. Simply double click on it and it will be automatically installed and be available on StreamDeck application under Custom actions tab.
+
+### Press it for quick updates!
+
+If you press the weather key, you will get the updated weather condition instantly! Otherwise, the weather status will automatically be updated every hour. 
 
 ## Settings
 
@@ -34,6 +36,11 @@ Unfortunately, AccuWeather offers only 50 calls per day for each plugin with fre
 Check out the image below:
 
 ![api-key-2](key-obtain.png)
+
+
+#### `Degree Type`
+
+You can set which degree type you'd like to see the temperature in. Currently, the only avaiable options are Celsius and Fahrenheit.
 
 #### `Country Code`
 
