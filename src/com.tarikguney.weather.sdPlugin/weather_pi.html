@@ -193,6 +193,7 @@
                 payload.apiKey = apiKey;
                 payload.city = city;
                 payload.countryCode = countryCode;
+                payload.degreeType = parseInt($("#degreeType option:selected").val());
 
                 $SD.api.sendToPlugin(uuid, actionName, payload);
             }
