@@ -27,23 +27,31 @@
 
         $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
             $SD.api.setSettings(jsonObj.context, jsonObj.payload);
+            initiateWeatherStatus(jsonObj.context, jsonObj.payload);
+        });
 
-            if (intervals[jsonObj.context]) {
-                let interval = intervals[jsonObj.context];
+        // When pressed, the weather status gets updated!
+        $SD.on(actionName + ".keyUp", function (jsonObj) {
+            initiateWeatherStatus(jsonObj.context, jsonObj.settings);
+        });
+
+        function initiateWeatherStatus(context, payload) {
+            if (intervals[context]) {
+                let interval = intervals[context];
                 clearInterval(interval);
             }
 
             // Initial call for the first time, then schedule for every 1 hours.
-            setTitleWithWeatherStatus(jsonObj.context, jsonObj.payload);
+            setTitleWithWeatherStatus(context, payload);
 
-            intervals[jsonObj.context] = setInterval(() => {
+            intervals[context] = setInterval(() => {
                     let settings = {};
                     // Just making sure we are not hurt by closure.
-                    Object.assign(jsonObj.payload, settings);
-                    setTitleWithWeatherStatus(jsonObj.context, settings);
+                    Object.assign(payload, settings);
+                    setTitleWithWeatherStatus(context, settings);
                 },
                 moment.duration(1, 'hours').asMilliseconds());
-        });
+        }
 
         function setTitleWithWeatherStatus(context, settings) {
             $SD.api.setTitle(context, "Updating...");
@@ -134,7 +142,7 @@
                         "Temperature": response[0].Temperature
                     });
                 })
-                .fail(function (jqxhr, textStatus, error) {
+                .fail(function (jqxhr) {
                     if (jqxhr.status === 503) {
                         updateTitleFn("Exceeded number of calls!")
                     } else {
