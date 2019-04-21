@@ -43,6 +43,10 @@ Weather Plugin support international weather forecast report. You can choose whi
 
 It is pretty clear as to what it is, however, only the USA Zip Codes are supported currently. This field is also known as Postal Code in different parts of the world.
 
+#### `City`
+
+`Zip Code` is not a universal thing so it is replaced with `City` when any country other than the US is selected. City and Zip Code fields show up automatically by which country is chosen. If the location you provided cannot be found, you will be notified.
+
 
 ## Problem?
 
