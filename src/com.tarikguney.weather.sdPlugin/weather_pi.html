@@ -22,6 +22,13 @@
         </details>
     </div>
     <div class="sdpi-item">
+        <div class="sdpi-item-label">Type</div>
+        <select class="sdpi-item-value select" id="degreeType">
+            <option value="0">Fahrenheit</option>
+            <option value="1">Celsius</option>
+        </select>
+    </div>
+    <div class="sdpi-item">
         <div class="sdpi-item-label">Instructions</div>
         <details class="sdpi-item-value">
             <p>You can learn more about this plugin and how to obtain an API key and Country Code by visiting its Github
@@ -74,6 +81,12 @@
             if (settings.apiKey) {
                 $("#apiKey").val(settings.apiKey);
             }
+
+            if (settings.degreeType) {
+                $("#degreeType option[value=" + settings.degreeType + "]")
+                    .prop("selected", "selected").change();
+            }
+
             if (settings.countryCode) {
                 $('#countryCode option[value=' + settings.countryCode + ']')
                     .prop('selected', 'selected').change();
@@ -115,13 +128,13 @@
 
             if (isUSSelected()) {
                 $("#zipCodeContainer").show();
-                
+
                 $("#cityContainer").hide();
                 $("#cityMessage").hide();
                 $("#zipCodeMessage").hide();
             } else {
                 $("#cityContainer").show();
-                
+
                 $("#zipCodeContainer").hide();
                 $("#zipCodeMessage").hide();
                 $("#cityMessage").hide();

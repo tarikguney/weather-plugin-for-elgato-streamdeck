@@ -61,6 +61,10 @@
                 return;
             }
 
+            if (result.DegreeType === 1) {
+                result.Temperature.Value = convertToCelsius(result.Temperature.Value);
+            }
+            
             $SD.api.setTitle(context, result.Mood.replace(new RegExp(' ', 'g'), '\n') +
                 "\n" + result.Temperature.Value + " " + result.Temperature.Unit);
 
@@ -79,7 +83,7 @@
             $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: settings.zipCode})
                 .done(function (response) {
                     if (response.length > 0 && response[0].Key) {
-                        getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                        getWeather(settings.degreeType, settings.apiKey, response[0].Key, updateTitleFn);
                     } else {
                         updateTitleFn("Location\nnot\nfound!");
                     }
@@ -100,7 +104,7 @@
             $.getJSON(locationEndPoint, {apikey: settings.apiKey, q: encodeURIComponent(settings.city)})
                 .done(function (response) {
                     if (response.length > 0 && response[0].Key) {
-                        getWeather(settings.apiKey, response[0].Key, updateTitleFn);
+                        getWeather(settings.degreeType, settings.apiKey, response[0].Key, updateTitleFn);
                     } else {
                         updateTitleFn("Location\nnot\nfound!");
                     }
@@ -114,13 +118,14 @@
                 });
         }
 
-        function getWeather(apiKey, locationKey, updateTitleFn) {
+        function getWeather(degreeType, apiKey, locationKey, updateTitleFn) {
             let endpoint = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{locationKey}"
                 .replace("{locationKey}", locationKey);
 
             $.getJSON(endpoint, {apikey: apiKey})
                 .done(function (response) {
                     updateTitleFn({
+                        "DegreeType": degreeType,
                         "Mood": response[0].IconPhrase,
                         "Icon": response[0].WeatherIcon,
                         "Temperature": response[0].Temperature
@@ -153,6 +158,14 @@
                 img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
                 img.src = src;
             }
+        }
+        
+        function convertToCelsius(fahrenheit){
+           return (fahrenheit-32) * (5/9);
+        }
+
+        function convertToFahrenheit(celsius) {
+            return (celsius * 9/5) + 32;
         }
     }
 
