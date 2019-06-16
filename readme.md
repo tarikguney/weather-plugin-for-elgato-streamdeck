@@ -26,6 +26,13 @@ You can change the settings using the property inspector pane on StreamDeck appl
 
 It does not have any effect. The title is automatically set with the current weather condition including the temperature.
 
+### `Automatic Refresh`
+
+If you want the weather forecast information to be loaded when the actions are loaded, turn on this setting. However, it comes with some caveats: AccuWeather API, which is used in this plugin to retrieve forecast information, allows only 50 requests per day to be made against their servers. Automatic Refresh may end up hitting this limit faster than the manual retrieval. It is advised to be careful with this option. The times when the automatic refresh will be triggered:
+
+1. StreamDeck is restarting.
+2. Switching profiles.
+
 #### `AccuWeather API Key`
 
 Unfortunately, AccuWeather offers only 50 calls per day for each plugin with free AccuWeather accounts. This plugin makes calls to the AccuWeather API to get the hourly weather information to display it on the StreamDeck canvas. Therefore, you need to create your own account and obtain API Key. It is really simple:
