@@ -21,6 +21,11 @@
             <summary>API is required. Please check the instructions to see how you can obtain it.</summary>
         </details>
     </div>
+    <div type="checkbox" class="sdpi-item">
+        <div class="sdpi-item-label">Automatic Refresh </div>
+        <input class="sdpi-item-value" id="automaticRefresh" type="checkbox">
+        <label for="automaticRefresh"><span></span></label>
+    </div>
     <div class="sdpi-item">
         <div class="sdpi-item-label">Type</div>
         <select class="sdpi-item-value select" id="degreeType">
@@ -56,11 +61,6 @@
         <div class="sdpi-item-label">City</div>
         <input class="sdpi-item-value" id="city" required>
     </div>
-    <div class="sdpi-item" id="cityMessage" style="display: none">
-        <details class="message caution">
-            <summary>City is required!</summary>
-        </details>
-    </div>
     <div class="sdpi-item">
         <button class="sdpi-item-value" id="updateButton">Update</button>
     </div>
@@ -85,6 +85,10 @@
             if (settings.degreeType) {
                 $("#degreeType option[value=" + settings.degreeType + "]")
                     .prop("selected", "selected").change();
+            }
+
+            if(settings.automaticRefresh){
+                $("#automaticRefresh").prop("checked",true);
             }
 
             if (settings.countryCode) {
@@ -167,6 +171,7 @@
             let countryCode = $("#countryCode option:selected").val();
             let zipCode = 0;
             let city = "";
+            let automaticRefresh = $("#automaticRefresh").prop("checked");
 
             if (isUSSelected()) {
                 zipCode = $("#zipCode").val();
@@ -188,7 +193,7 @@
 
             if ($SD && $SD.connection) {
                 let payload = {};
-
+                payload.automaticRefresh = automaticRefresh;
                 payload.zipCode = zipCode;
                 payload.apiKey = apiKey;
                 payload.city = city;

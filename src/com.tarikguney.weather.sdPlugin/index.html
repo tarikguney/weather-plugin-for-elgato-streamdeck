@@ -22,7 +22,11 @@
         });
 
         $SD.on(actionName + ".willAppear", function (jsonObj) {
-            $SD.api.getSettings(jsonObj.context);
+            let settings = jsonObj.payload.settings;
+            if(settings.automaticRefresh && (settings.zipCode || settings.city) &&
+                settings.apiKey && settings.countryCode && settings.degreeType){
+                initiateWeatherStatus(jsonObj.context, jsonObj.payload.settings);
+            }
         });
 
         $SD.on(actionName + ".sendToPlugin", function (jsonObj) {
