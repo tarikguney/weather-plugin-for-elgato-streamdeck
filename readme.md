@@ -24,7 +24,7 @@ You can change the settings using the property inspector pane on StreamDeck appl
 
 #### `Title`
 
-It does not have any effect. The title is automatically set with the current weather condition including the temperature.
+Do not set the title, and leave it empty! The title is automatically set with the current weather condition including the temperature.
 
 #### `Automatic Refresh`
 
